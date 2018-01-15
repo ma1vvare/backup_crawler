@@ -1,0 +1,890 @@
+{% extends "layout.html" %}
+{% block title %}Daily_apks{% endblock %}
+{% block content %}
+
+  <h4>Date of Top downloaded APK : {{ date }}</h4>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li><a href="#by_categories_gplay" role="tab" data-toggle="tab">Gplay By Categories</a></li>
+    <li><a href="#by_antivirus_gplay" role="tab" data-toggle="tab">Gplay By Anti-Virus</a></li>
+    <li class="active"><a href="#by_categories_mapk" role="tab" data-toggle="tab">mapk By Categories</a></li>
+    <li><a href="#by_antivirus_mapk" role="tab" data-toggle="tab">mapk By Anti-Virus</a></li>
+    <li><a href="#by_categories_APKPure" role="tab" data-toggle="tab">APKPure By Categories</a></li>
+    <li><a href="#by_antivirus_APKPure" role="tab" data-toggle="tab">APKPure By Anti-Virus</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <!-- Sort by catogories -->
+    <div role="tabpanel" class="tab-pane" id="by_categories_gplay">
+      {% for cat in categories_gplay %}
+        <div class="col-md-6">
+        <h5>{{ cat }}</h5>
+          <table class="table">
+            <thead>
+                <tr>
+                    <th>Anti-Virus</th>
+                    <th>Permission</th>
+                    <th>URL</th>
+                    <th>IP</th>
+                    <th>APK name</th>
+                    <th>rank</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for rank in categories_gplay[cat] %}
+              {% if categories_gplay[cat][rank]['av_result'] %}
+                {% if categories_gplay[cat][rank]['av_result']['summary']['positives'] == 0 %}
+                  <tr>
+                    <td class="success">
+                      {{ categories_gplay[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_gplay[cat][rank]['av_result']['summary']['total'] }}
+                    </td>
+                {% else %}
+                  <tr>
+                    <td class="danger"><a data-toggle="modal" data-target="#{{ categories_gplay[cat][rank]['_id'] }}">
+                      {{ categories_gplay[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_gplay[cat][rank]['av_result']['summary']['total'] }}
+                    </a></td>
+                {% endif %}
+                </td>
+                {% if permission_gplay[cat][rank]|length > 0 %}
+                    {% set permission_detail_gplay = cat + rank|string %}
+                    <td class = "warning"><a data-toggle="modal" data-target="#{{ permission_detail_gplay }}">
+                        {{ permission_gplay[cat][rank]|length }}
+                    </a></td>
+                {% else %}
+                    <td>{{ permission_gplay[cat][rank]|length }}</td>
+                {% endif %}
+
+                {% if URL_gplay[cat][rank]|length > 0 %}
+                {% set temp = cat + rank | string%}
+                  {% set URL_detail_gplay = cat + temp %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ URL_detail_gplay }}">
+                      {{ URL_gplay[cat][rank]|length }}
+                  </a></td>
+                {% else %}
+                    <td>{{ URL_gplay[cat][rank]|length }}</td>
+                {% endif %}
+
+                {% if IP_gplay[cat][rank]|length > 0 %}
+                  {% set temp = cat + rank |string %}
+                      {% set IP_detail_gplay = temp + rank |string %}
+                    <td class = "warning">
+                      <a data-toggle="modal" data-target = "#{{ IP_detail_gplay }}">
+                        {{ IP_gplay[cat][rank]|length }}
+                    </a>
+                  </td>
+                {% else %}
+                    <td>{{ IP_gplay[cat][rank]|length }}</td>
+                {% endif %}
+                  <td>{{ categories_gplay[cat][rank]['name'] }}</td>
+                  <td>{{ categories_gplay[cat][rank]['rank'] }}</td>
+                </tr>
+              {% else %}
+              <tr>
+                <td></td>
+                {% if permission_gplay[cat][rank]|length > 0 %}
+                    {% set permission_detail_gplay = cat + rank|string %}
+                    <td class = "warning"><a data-toggle="modal" data-target="#{{ permission_detail_gplay }}">
+                        {{ permission_gplay[cat][rank]|length }}
+                    </a></td>
+                {% else %}
+                    <td>{{ permission_gplay[cat][rank]|length }}</td>
+                {% endif %}
+
+                {% if URL_gplay[cat][rank]|length > 0 %}
+                  {% set temp = cat + rank | string%}
+                  {% set URL_detail_gplay = cat + temp %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ URL_detail_gplay }}">
+                      {{ URL_gplay[cat][rank]|length }}
+                  </a></td>
+                {% else %}
+                    <td>{{ URL_gplay[cat][rank]|length }}</td>
+                {% endif %}
+
+                {% if IP_gplay[cat][rank]|length > 0 %}
+                  {% set temp = cat + rank |string %}
+                      {% set IP_detail_gplay = temp + rank |string %}
+                    <td class = "warning">
+                      <a data-toggle="modal" data-target = "#{{ IP_detail_gplay }}">
+                        {{ IP_gplay[cat][rank]|length }}
+                    </a>
+                  </td>
+                {% else %}
+                    <td>{{ IP_gplay[cat][rank]|length }}</td>
+                {% endif %}
+                <td>{{ categories_gplay[cat][rank]['name'] }}</td>
+                <td>{{ categories_gplay[cat][rank]['rank'] }}</td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endfor %}
+    </div>
+
+
+    <!-- Sort by Anti-Virus -->
+    <div role="tabpanel" class="tab-pane" id="by_antivirus_gplay">
+      {% for time in antivirus_gplay|sort(reverse=True) %}
+        <div>
+        <h5>{{ time }}</h5>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Anti-Virus</th>
+                <th>APK name</th>
+                <th>Version</th>
+                <th>MD5</th>
+                <th>category</th>
+                <th>rank</th>
+              </tr>
+            </thead>
+          <tbody>
+            {% for name in antivirus_gplay[time] %}
+              <tr class="danger">
+                <td><a data-toggle="modal" data-target="#{{ antivirus_gplay[time][name]['_id'] }}">
+                  {{ antivirus_gplay[time][name]['av_result']['summary']['positives'] }}/{{ antivirus_gplay[time][name]['av_result']['summary']['total'] }}
+                </a></td>
+                <td>{{ antivirus_gplay[time][name]['name'] }}</td>
+                <td>{{ antivirus_gplay[time][name]['version'] }}</td>
+                <td>{{ antivirus_gplay[time][name]['md5'] }}</td>
+                <td>{{ antivirus_gplay[time][name]['title'] }}</td>
+                <td>{{ antivirus_gplay[time][name]['rank'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="by_antivirus_mapk">
+      {% for time in antivirus_mapk|sort(reverse=True) %}
+        <div>
+        <h5>{{ time }}</h5>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Anti-Virus</th>
+                <th>APK name</th>
+                <th>Version</th>
+                <th>MD5</th>
+                <th>category</th>
+                <th>rank</th>
+              </tr>
+            </thead>
+          <tbody>
+            {% for name in antivirus_mapk[time] %}
+              <tr class="danger">
+                <td><a data-toggle="modal" data-target="#{{ antivirus_mapk[time][name]['_id'] }}">
+                  {{ antivirus_mapk[time][name]['av_result']['summary']['positives'] }}/{{ antivirus_mapk[time][name]['av_result']['summary']['total'] }}
+                </a></td>
+                <td>{{ antivirus_mapk[time][name]['name'] }}</td>
+                <td>{{ antivirus_mapk[time][name]['version'] }}</td>
+                <td>{{ antivirus_mapk[time][name]['md5'] }}</td>
+                <td>{{ antivirus_mapk[time][name]['title'] }}</td>
+                <td>{{ antivirus_mapk[time][name]['rank'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="by_antivirus_APKPure">
+      {% for time in antivirus_APKPure|sort(reverse=True) %}
+        <div>
+        <h5>{{ time }}</h5>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Anti-Virus</th>
+                <th>APK name</th>
+                <th>Version</th>
+                <th>MD5</th>
+                <th>category</th>
+                <th>rank</th>
+              </tr>
+            </thead>
+          <tbody>
+            {% for name in antivirus_APKPure[time] %}
+              <tr class="danger">
+                <td><a data-toggle="modal" data-target="#{{ antivirus_APKPure[time][name]['_id'] }}">
+                  {{ antivirus_APKPure[time][name]['av_result']['summary']['positives'] }}/{{ antivirus_APKPure[time][name]['av_result']['summary']['total'] }}
+                </a></td>
+                <td>{{ antivirus_APKPure[time][name]['name'] }}</td>
+                <td>{{ antivirus_APKPure[time][name]['version'] }}</td>
+                <td>{{ antivirus_APKPure[time][name]['md5'] }}</td>
+                <td>{{ antivirus_APKPure[time][name]['title'] }}</td>
+                <td>{{ antivirus_APKPure[time][name]['rank'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      {% endfor %}
+    </div>
+
+  <!--modal for Anti-Virus result -->
+  {% for time in antivirus_gplay %}
+    {% for name in antivirus_gplay[time] %}
+      <div class="modal fade" id="{{ antivirus_gplay[time][name]['_id'] }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Anti-Virus result for {{ antivirus_gplay[time][name]['name'] }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="list-group">
+                <li class="list-group-item">APK code name: {{ antivirus_gplay[time][name]['pgname'] }}</li>
+                <li class="list-group-item">APK version: {{ antivirus_gplay[time][name]['version'] }}</li>
+                <li class="list-group-item">APK md5: {{ antivirus_gplay[time][name]['md5'] }}</li>
+                <li class="list-group-item">
+                  <form class="form-inline" method="post" action="download/">
+                  <button class = "btn btn-primary" type = "submit" name="download_apk" value={{ antivirus_gplay[time][name]['_id'] }} >
+                    Download
+                  </button>
+                  </form>
+                </li>
+              </div>
+              <div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>AV-Engine</th>
+                      <th>Version</th>
+                      <th>Result</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                  {% for avresult in antivirus_gplay[time][name]['av_result'] %}
+                    {% if avresult != 'summary' %}
+                      <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ avresult }}</td>
+                        <td>{{ antivirus_gplay[time][name]['av_result'][avresult]['version'] }}</td>
+                        <td>{{ antivirus_gplay[time][name]['av_result'][avresult]['result'] }}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <!-- Permission Modal -->
+
+  {% for cat in categories_gplay %}
+      {% for rank in categories_gplay[cat] %}
+          {# {% set permission_detail = ["cat", rank ] %} #}
+          {% set permission_detail_gplay = cat + rank|string %}
+      {# <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> #}
+          <div class="modal fade" id="{{ permission_detail_gplay }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Dangerous Permission</h4>
+                </div>
+                <div class="modal-body">
+                  {% for i in permission_gplay[cat][rank]%}
+                   <li>{{ i }}</li>
+                  {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  {# <button type="button" class="btn btn-primary">Save changes</button> #}
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+  <!-- gplay URL Modal -->
+
+  {% for cat in categories_gplay %}
+    {% for rank in categories_gplay[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set URL_detail_gplay = cat + temp %}
+          <div class="modal fade" id="{{ URL_detail_gplay }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_URL</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in URL_gplay[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+  <!-- gplay IP Modal -->
+
+  {% for cat in categories_gplay %}
+    {% for rank in categories_gplay[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set IP_detail_gplay = temp + rank |string %}
+          <!-- <div class="modal fade" id="{{ URL_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
+          <div class="modal fade" id="{{ IP_detail_gplay }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_IP</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in IP_gplay[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+
+
+
+
+
+
+  <!-- mapk  -->
+  <div role="tabpanel" class="tab-pane active" id="by_categories_mapk">
+    {% for cat in categories_mapk %}
+      <div class="col-md-6">
+      <h5>{{ cat }}</h5>
+        <table class="table">
+          <thead>
+              <tr>
+                  <th>Anti-Virus</th>
+                  <th>Permission</th>
+                  <th>URL</th>
+                  <th>IP</th>
+                  <th>APK name</th>
+                  <th>rank</th>
+              </tr>
+          </thead>
+          <tbody>
+          {% for rank in categories_mapk[cat] %}
+            {% if categories_mapk[cat][rank]['av_result'] %}
+              {% if categories_mapk[cat][rank]['av_result']['summary']['positives'] == 0 %}
+                <tr>
+                  <td class="success">
+                    {{ categories_mapk[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_mapk[cat][rank]['av_result']['summary']['total'] }}
+                  </td>
+              {% else %}
+                <tr>
+                  <td class="danger"><a data-toggle="modal" data-target="#{{ categories_mapk[cat][rank]['_id'] }}">
+                    {{ categories_mapk[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_mapk[cat][rank]['av_result']['summary']['total'] }}
+                  </a></td>
+              {% endif %}
+              </td>
+              {% if permission_mapk[cat][rank]|length > 0 %}
+                  {% set permission_detail_mapk = cat + rank|string %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ permission_detail_mapk }}">
+                      {{ permission_mapk[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ permission_mapk[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if URL_mapk[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                  {% set URL_detail_mapk = cat + temp %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ URL_detail_mapk }}">
+                      {{ URL_mapk[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ URL_mapk[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if IP_mapk[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                    {% set IP_detail_mapk = temp + rank |string %}
+                  <td class = "warning">
+                    <a data-toggle="modal" data-target = "#{{ IP_detail_mapk }}">
+                      {{ IP_mapk[cat][rank]|length }}
+                  </a>
+                </td>
+              {% else %}
+                  <td>{{ IP_mapk[cat][rank]|length }}</td>
+              {% endif %}
+              <td>{{ categories_mapk[cat][rank]['name'] }}</td>
+              <td>{{ categories_mapk[cat][rank]['rank'] }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td></td>
+              {% if permission_mapk[cat][rank]|length > 0 %}
+                  {% set permission_detail_mapk = cat + rank|string %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ permission_detail_mapk }}">
+                      {{ permission_mapk[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ permission_mapk[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if URL_mapk[cat][rank]|length > 0 %}
+                {% set temp = cat + rank | string%}
+                  {% set URL_detail_mapk = cat + temp %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ URL_detail_mapk }}">
+                      {{ URL_mapk[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ URL_mapk[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if IP_mapk[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                    {% set IP_detail_mapk = temp + rank |string %}
+                  <td class = "warning">
+                    <a data-toggle="modal" data-target = "#{{ IP_detail_mapk }}">
+                      {{ IP_mapk[cat][rank]|length }}
+                  </a>
+                </td>
+              {% else %}
+                  <td>{{ IP_mapk[cat][rank]|length }}</td>
+              {% endif %}
+              <td>{{ categories_mapk[cat][rank]['name'] }}</td>
+              <td>{{ categories_mapk[cat][rank]['rank'] }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!--modal for Anti-Virus result -->
+  {% for time in antivirus_mapk %}
+    {% for name in antivirus_mapk[time] %}
+      <div class="modal fade" id="{{ antivirus_mapk[time][name]['_id'] }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Anti-Virus result for {{ antivirus_mapk[time][name]['name'] }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="list-group">
+                <li class="list-group-item">APK code name: {{ antivirus_mapk[time][name]['pgname'] }}</li>
+                <li class="list-group-item">APK version: {{ antivirus_mapk[time][name]['version'] }}</li>
+                <li class="list-group-item">APK md5: {{ antivirus_mapk[time][name]['md5'] }}</li>
+                <li class="list-group-item">
+                  <form class="form-inline" method="post" action="download/">
+                  <button class = "btn btn-primary" type = "submit" name="download_apk" value={{ antivirus_mapk[time][name]['_id'] }} >
+                    Download
+                  </button>
+                  </form>
+                </li>
+              </div>
+              <div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>AV-Engine</th>
+                      <th>Version</th>
+                      <th>Result</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                  {% for avresult in antivirus_mapk[time][name]['av_result'] %}
+                    {% if avresult != 'summary' %}
+                      <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ avresult }}</td>
+                        <td>{{ antivirus_mapk[time][name]['av_result'][avresult]['version'] }}</td>
+                        <td>{{ antivirus_mapk[time][name]['av_result'][avresult]['result'] }}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <!-- mapk Permission Modal -->
+
+  {% for cat in categories_mapk %}
+      {% for rank in categories_mapk[cat] %}
+          {% set permission_detail_mapk = cat + rank|string %}
+      {# <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> #}
+          <div class="modal fade" id="{{ permission_detail_mapk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="myModalLabel">Dangerous Permission</h4>
+                </div>
+                <div class="modal-body">
+                  {% for i in permission_mapk[cat][rank]%}
+                   <li>{{ i }}</li>
+                  {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  {# <button type="button" class="btn btn-primary">Save changes</button> #}
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+
+  <!-- mapk URL Modal -->
+
+  {% for cat in categories_mapk %}
+    {% for rank in categories_mapk[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set URL_detail_mapk = cat + temp %}
+          <div class="modal fade" id="{{ URL_detail_mapk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_URL</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in URL_mapk[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+  <!-- mapk IP Modal -->
+
+  {% for cat in categories_mapk %}
+    {% for rank in categories_mapk[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set IP_detail_mapk = temp + rank |string %}
+          <!-- <div class="modal fade" id="{{ URL_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
+          <div class="modal fade" id="{{ IP_detail_mapk }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_IP</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in IP_mapk[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- APKPure modules -->
+  <div role="tabpanel" class="tab-pane active" id="by_categories_APKPure">
+    {% for cat in categories_APKPure %}
+      <div class="col-md-6">
+      <h5>{{ cat }}</h5>
+        <table class="table">
+          <thead>
+              <tr>
+                  <th>Anti-Virus</th>
+                  <th>Permission</th>
+                  <th>URL</th>
+                  <th>IP</th>
+                  <th>APK name</th>
+                  <th>rank</th>
+              </tr>
+          </thead>
+          <tbody>
+          {% for rank in categories_APKPure[cat] %}
+            {% if categories_APKPure[cat][rank]['av_result'] %}
+              {% if categories_APKPure[cat][rank]['av_result']['summary']['positives'] == 0 %}
+                <tr>
+                  <td class="success">
+                    {{ categories_APKPure[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_APKPure[cat][rank]['av_result']['summary']['total'] }}
+                  </td>
+              {% else %}
+                <tr>
+                  <td class="danger"><a data-toggle="modal" data-target="#{{ categories_APKPure[cat][rank]['_id'] }}">
+                    {{ categories_APKPure[cat][rank]['av_result']['summary']['positives'] }}/{{ categories_APKPure[cat][rank]['av_result']['summary']['total'] }}
+                  </a></td>
+              {% endif %}
+              </td>
+              {% if permission_APKPure[cat][rank]|length > 0 %}
+                  {% set permission_detail_APKPure = cat + rank|string %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ permission_detail_APKPure }}">
+                      {{ permission_APKPure[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ permission_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if URL_APKPure[cat][rank]|length > 0 %}
+              {% set temp = cat + rank |string %}
+                  {% set URL_detail_APKPure = cat + temp %}
+                  <td class = "warning"><a data-toggle="modal" data-target="#{{ URL_detail_APKPure }}">
+                      {{ URL_APKPure[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ URL_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if IP_APKPure[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                    {% set IP_detail_APKPure = temp + rank |string %}
+                  <td class = "warning">
+                    <a data-toggle="modal" data-target = "#{{ IP_detail_APKPure }}">
+                      {{ IP_APKPure[cat][rank]|length }}
+                  </a>
+                </td>
+              {% else %}
+                  <td>{{ IP_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+
+              <td>{{ categories_APKPure[cat][rank]['name'] }}</td>
+              <td>{{ categories_APKPure[cat][rank]['rank'] }}</td>
+            </tr>
+
+            {% else %}
+            <tr>
+              <td></td>
+              {% if permission_APKPure[cat][rank]|length > 0 %}
+                  {% set permission_detail_APKPure = cat + rank |string %}
+                  <!-- <td class = "warning"><a data-toggle="modal" data-target="#myModal"> -->
+                  <td class = "warning"><a data-toggle="modal" data-target = "#{{ permission_detail_APKPure }}">
+                      {{ permission_APKPure[cat][rank]|length }}
+                  </a></td>
+              {% else %}
+                  <td>{{ permission_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+
+              {% if URL_APKPure[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                    {% set URL_detail_APKPure = cat + temp %}
+                  <td class = "warning">
+                    <a data-toggle="modal" data-target = "#{{ URL_detail_APKPure }}">
+                      {{ URL_APKPure[cat][rank]|length }}
+                  </a>
+                </td>
+              {% else %}
+                  <td>{{ URL_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+
+
+              {% if IP_APKPure[cat][rank]|length > 0 %}
+                {% set temp = cat + rank |string %}
+                    {% set IP_detail_APKPure = temp + rank |string %}
+                  <td class = "warning">
+                    <a data-toggle="modal" data-target = "#{{ IP_detail_APKPure }}">
+                      {{ IP_APKPure[cat][rank]|length }}
+                  </a>
+                </td>
+              {% else %}
+                  <td>{{ IP_APKPure[cat][rank]|length }}</td>
+              {% endif %}
+              <td>{{ categories_APKPure[cat][rank]['name'] }}</td>
+              <td>{{ categories_APKPure[cat][rank]['rank'] }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  </div>
+
+
+
+  <!--modal for APKPure Anti-Virus result -->
+  {% for time in antivirus_APKPure %}
+    {% for name in antivirus_APKPure[time] %}
+      <div class="modal fade" id="{{ antivirus_APKPure[time][name]['_id'] }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">Anti-Virus result for {{ antivirus_APKPure[time][name]['name'] }}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="list-group">
+                <li class="list-group-item">APK code name: {{ antivirus_APKPure[time][name]['pgname'] }}</li>
+                <li class="list-group-item">APK version: {{ antivirus_APKPure[time][name]['version'] }}</li>
+                <li class="list-group-item">APK md5: {{ antivirus_APKPure[time][name]['md5'] }}</li>
+                <li class="list-group-item">
+                  <form class="form-inline" method="post" action="download/">
+                  <button class = "btn btn-primary" type = "submit" name="download_apk" value={{ antivirus_APKPure[time][name]['_id'] }} >
+                    Download
+                  </button>
+                  </form>
+                </li>
+              </div>
+              <div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>AV-Engine</th>
+                      <th>Version</th>
+                      <th>Result</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                  {% for avresult in antivirus_APKPure[time][name]['av_result'] %}
+                    {% if avresult != 'summary' %}
+                      <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ avresult }}</td>
+                        <td>{{ antivirus_APKPure[time][name]['av_result'][avresult]['version'] }}</td>
+                        <td>{{ antivirus_APKPure[time][name]['av_result'][avresult]['result'] }}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+
+  <!-- APKPure Permission Modal -->
+
+  {% for cat in categories_APKPure %}
+       {% for rank in categories_APKPure[cat] %}
+          {% set permission_detail_APKPure = cat + rank|string %}
+          <div class="modal fade" id="{{ permission_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Dangerous Permission</h4>
+                </div>
+                <div class="modal-body">
+                  {% for i in permission_APKPure[cat][rank]%}
+                  <li>{{ i }}</li>
+                  {% endfor %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+
+  <!-- APKPure URL Modal -->
+
+  {% for cat in categories_APKPure %}
+    {% for rank in categories_APKPure[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set URL_detail_APKPure = cat + temp |string %}
+          <div class="modal fade" id="{{ URL_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_URL</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in URL_APKPure[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+
+  <!-- APKPure IP Modal -->
+
+  {% for cat in categories_APKPure %}
+    {% for rank in categories_APKPure[cat] %}
+      {% set temp = cat + rank |string %}
+          {% set IP_detail_APKPure = temp + rank |string %}
+          <!-- <div class="modal fade" id="{{ URL_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
+          <div class="modal fade" id="{{ IP_detail_APKPure }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">Interesting_strings_IP</h4>
+                </div>
+                <div class="modal-body">
+                   {% for i in IP_APKPure[cat][rank]%}
+                    <li>{{ i }}</li>
+                   {% endfor  %}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor  %}
+  {% endfor  %}
+
+{% endblock %}
